@@ -1,5 +1,5 @@
 /****************************************************************
- *      Basic Javascrip animation on an HTML5 Canvas
+ *      Basic Typescript animation on an HTML5 Canvas
  *      ---------------------------------------------
  
  *      Will load image of a knight and a rocks, and moves the 
@@ -9,24 +9,42 @@
  ****************************************************************/
 
 
-const ANIMATION_PERIOD = 1000/20;
-const SCREEN_WIDTH     =  1000;
-const SCREEN_HEIGHT    =  1000;
+const ANIMATION_PERIOD : number =  1000/20;
+const SCREEN_WIDTH : number     =  1000;
+const SCREEN_HEIGHT : number    =  1000;
 
 
-let canvas,ctx;
 
-let knightImg, rockImg;
+let canvas  : HTMLCanvasElement | null; 
+let targetCanvas : HTMLCanvasElement | null;
+let ctx : CanvasRenderingContext2D | null;
 
-let rocks = [];
-let startTime = 0;
-let totalUpdates = 0;
-let frameRate = 0;
+
+let rocks : VideoObject[] = [];
+let startTime : number = 0;
+let totalUpdates : number = 0;
+let frameRate : string = "";
+
+let knightImg : CanvasImageSource;
+let rockImg: CanvasImageSource;
 
 
 class  VideoObject {
 
-  constructor( image,xPos, yPos, width, height) {
+    name: string;
+    xPos : number; 
+    yPos : number; 
+    width : number; 
+    height : number;
+    
+    dX : number;
+    dY : number;
+    active: boolean;
+
+    image : CanvasImageSource;
+
+
+  constructor( image : CanvasImageSource,xPos : number, yPos : number, width : number, height: number) {
       this.image = image;
       this.xPos = xPos;
       this.yPos = yPos;
@@ -60,7 +78,7 @@ class  VideoObject {
       if ( this.yPos < 0 ||  this.yPos >= SCREEN_HEIGHT  )  this.reset();
     }
 
-    draw(context){
+    draw(context : CanvasRenderingContext2D){
 
       if ( this.active === false) return;
       context.drawImage(this.image,  
@@ -78,18 +96,21 @@ class  VideoObject {
 };
 
 
- function init() {
+ export function init() {
    console.log("Started Initialisation of animation...");
 
+   canvas = document.getElementById("graph-canvas") as HTMLCanvasElement;
+   if (canvas === null)  return;
 
-   canvas = document.getElementById('canvas');
+
+
    ctx = canvas.getContext('2d');
    canvas.height = window.innerHeight;
    canvas.width = window.innerWidth;
 
    console.log("Canvas Size [widht, height] = [" + canvas.width + "," + canvas.height + "]");
 
-   yCircle = canvas.height / 2;
+   //yCircle = canvas.height / 2;
 
    loadImages();
 
@@ -122,20 +143,23 @@ class  VideoObject {
 
  }
 
+
+
+
  function loadImages() {
 
   knightImg = new Image();
   knightImg.onload = function() {
     console.log("Image loaded (Knight)");
   };
-  knightImg.src = './resources/img/knight.png';
+  knightImg.src = './img/knight.png';
 
   
   rockImg = new Image();
   rockImg.onload = function() {
     console.log("Image loaded (Rockt)");
   };
-  rockImg.src = './resources/img/rock.png';
+  rockImg.src = './img/rock.png';
 
   
  }
@@ -153,7 +177,10 @@ function update() {
     }   
 }
 
-function render(){
+export function render(){
+
+  if (canvas === null)  return;
+  if (ctx === null)  return;
 
   ctx.clearRect(0,0,canvas.width, canvas.height);
 
